@@ -1,0 +1,1 @@
+INSERT INTO websites(url) VALUES ('https://www.google.com'),('https://www.reddit.com'),('https://github.com/');
