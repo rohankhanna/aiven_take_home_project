@@ -4,8 +4,7 @@ import json
 import sys
 from utils import *
 
-if __name__ == "__main__":
-
+def consumer(run_once=False):
     kafka_config = get_kafka_config()
 
     consumer = KafkaConsumer(
@@ -52,3 +51,12 @@ if __name__ == "__main__":
             except (KeyboardInterrupt, Exception, psycopg2.Error) as error:
                 pg_connection.close()
                 raise RuntimeError("Error while inserting into PG database: {error}")
+        if run_once:
+            return
+
+
+def main():
+    consumer()
+
+if __name__ == "__main__":
+    main()

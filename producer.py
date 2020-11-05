@@ -31,16 +31,11 @@ def is_url_up(url, website_id):
 
     return data
 
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Expecting a single argument: delay")
-        exit()
-
-    delay = int(sys.argv[1])
+def get_website_ids():
+    global url_regex
+    website_ids = {}
     pg_connection = get_pg_connection()
     cursor = pg_connection.cursor()
-    website_ids = {}
     for url, _ in url_regex.items():
         cursor.execute("SELECT id from websites WHERE url = '" + url + "';")
         results = cursor.fetchall()
@@ -50,10 +45,11 @@ if __name__ == "__main__":
             )
             results = cursor.fetchall()
         website_ids[url] = results[0][0]
-
     cursor.close()
     pg_connection.commit()
-
+    return website_ids
+    
+def producer(delay, website_ids, run_once=False):
     config = get_kafka_config()
 
     producer = KafkaProducer(
@@ -72,3 +68,17 @@ if __name__ == "__main__":
             producer.send(config["topic"], item)
         producer.flush()
         print("Published at: ", datetime.datetime.now())
+        if run_once:
+            return
+
+def main():
+    if len(sys.argv) != 2:
+        print("Expecting a single argument: delay")
+        exit()
+
+    delay = int(sys.argv[1])
+    website_ids = get_website_ids():
+    producer(delay, website_ids)
+
+if __name__ == "__main__":
+    main()
