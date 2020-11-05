@@ -38,6 +38,7 @@ In another shell session, run the producer:
 ```bash
 # in a separate shell session, enter the venv
 $ poetry shell
+$ source .env
 # Run the Kafka event producer
 $ python producer <delay> # the <delay> parameter is a value that represents how long must the producer wait
 # before it scans for website availability (in seconds)
