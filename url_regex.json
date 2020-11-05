@@ -1,0 +1,5 @@
+{
+    "https://www.google.com": "<span class=\"ds\"><span class=\"lsbb\"><input class=\"lsb\" value=\"Google Suche\" name=\"btnG\" type=\"submit\"></span></span>",
+    "https://www.reddit.com": "<input type=\"search\" id=\"header-search-bar\"",
+    "https://github.com": "GitHub is a development platform inspired by the way you work."
+}

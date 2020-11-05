@@ -1,4 +1,3 @@
-# Import KafkaProducer from Kafka library
 from kafka import KafkaProducer
 import os
 import json
@@ -11,21 +10,13 @@ import re
 import sys
 
 
-url_regex = {
-    'https://www.google.com':'<span class="ds"><span class="lsbb"><input class="lsb" value="Google Suche" name="btnG" type="submit"></span></span>',
-    'https://www.reddit.com':'<input type="search" id="header-search-bar"',
-    'https://github.com':"GitHub is a development platform inspired by the way you work."
-}
-
-
-
+url_regex = {}
+with open('url_regex.json', 'r') as file:
+  url_regex = json.load(file)
 
 def is_url_up(url, website_id):
 
     r = requests.get(url)
-    # print(r.text)
-    # print(r.status_code)
-    # print(r.elapsed.total_seconds())
   
     data = \
     [
@@ -42,7 +33,7 @@ def is_url_up(url, website_id):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Expecting a single argument delay")
+        print("Expecting a single argument: delay")
         exit()
 
     delay = int(sys.argv[1])
@@ -76,10 +67,8 @@ if __name__ == "__main__":
         for url, website_id in website_ids.items():
             item = is_url_up(url, website_id)
             producer.send(config["topic"], item)
-        print("awaiting user input")
-        input()
         producer.flush()
-        print(print(datetime.datetime.now()))
+        print(print( "published at: ", datetime.datetime.now()))
 
 
     
