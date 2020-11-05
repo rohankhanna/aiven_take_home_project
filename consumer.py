@@ -21,17 +21,17 @@ if __name__ == "__main__":
         enable_auto_commit=True
     )
 
-    data = []
-    url_id_map = {'https://www.google.com':1,'https://www.reddit.com':2, 'https://github.com/':3} # replace with get request on table websites
+
     pg_connection = get_pg_connection()
     
     while True:
+        data = []
         messages = consumer.poll(timeout_ms=1000)
         if not messages.items():
             print(messages.items())
         for _, messages in messages.items():
             for message in messages:
-                data.append(message.value)
+                data.append(message.value[0])
                 print(message.value)
         
         if data:
@@ -39,7 +39,8 @@ if __name__ == "__main__":
                 cursor = pg_connection.cursor()
                 for item in data:
                     # insert query based on the data received
-                    cursor.execute("INSERT INTO availability (website_id, content) VALUES(%s, %s);", (url_id_map[item['url']],item['content']))
+                    # {'website_id': 12, 'available': True, 'status_code': 200, 'response_time': 0.175816, 'timestamp': '2020-11-05 16:20:04.226092'}]
+                    cursor.execute("INSERT INTO availability (website_id, available, status_code, response_time) VALUES(%s, %s, %s, %s);", (item['website_id'], item['available'], item['status_code'], item['response_time']))
                 cursor.close()
                 pg_connection.commit()
             except (KeyboardInterrupt, Exception, psycopg2.Error) as error:

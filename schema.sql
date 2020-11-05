@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS websites (
     content TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    UNIQUE(url)
 );
 
 CREATE TRIGGER set_timestamp_websites
@@ -28,8 +29,10 @@ EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE IF NOT EXISTS availability (
     id INT GENERATED ALWAYS AS IDENTITY,
-    website_id INT,
-    content TEXT,
+    website_id INT NOT NULL,
+    status_code INT NOT NULL,
+    response_time INT NOT NULL,
+    available BOOLEAN NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY(id),

@@ -5,21 +5,60 @@ import json
 import datetime
 import random
 from utils import *
+import time
+import requests
+import re
+import sys
 
-urls = ['https://www.google.com', 'https://www.reddit.com', 'https://github.com/'];
-def get_data():
 
+url_regex = {
+    'https://www.google.com':'<span class="ds"><span class="lsbb"><input class="lsb" value="Google Suche" name="btnG" type="submit"></span></span>',
+    'https://www.reddit.com':'<input type="search" id="header-search-bar"',
+    'https://github.com':"GitHub is a development platform inspired by the way you work."
+}
+
+
+
+
+def is_url_up(url, website_id):
+
+    r = requests.get(url)
+    # print(r.text)
+    # print(r.status_code)
+    # print(r.elapsed.total_seconds())
+  
     data = \
     [
         {
-            "url" : random.choice(urls),
-            "content" : str(datetime.datetime.now())*10
+            "website_id" : website_id,
+            "available" : True if re.search(url_regex[url], r.text) else False,
+            "status_code": r.status_code,
+            "response_time": r.elapsed.total_seconds(),
+            "timestamp": str(datetime.datetime.now())
         }
     ]
     
     return data
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Expecting a single argument delay")
+        exit()
+
+    delay = int(sys.argv[1])
+    pg_connection = get_pg_connection()
+    cursor = pg_connection.cursor()
+    website_ids = {}
+    for url, _ in url_regex.items():
+        cursor.execute("SELECT id from websites WHERE url = '"+url+"';")
+        results = cursor.fetchall()
+        if len(results) < 1:
+            cursor.execute("INSERT INTO websites(url) VALUES ('"+url+"') RETURNING id;")
+            results = cursor.fetchall()
+        website_ids[url] = results[0][0]
+    
+    cursor.close()
+    pg_connection.commit()
     
     config = get_kafka_config()
     
@@ -33,8 +72,12 @@ if __name__ == "__main__":
     )
     
     while True:
-        for item in get_data():
-                producer.send(config["topic"], item)
+        time.sleep(delay)
+        for url, website_id in website_ids.items():
+            item = is_url_up(url, website_id)
+            producer.send(config["topic"], item)
+        print("awaiting user input")
+        input()
         producer.flush()
         print(print(datetime.datetime.now()))
 

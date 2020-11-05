@@ -9,6 +9,7 @@ python = "^3.8"
 kafka-python = "^2.0.2"
 psycopg2 = "^2.8.6"
 unittest2 = "^1.1.0"
+requests = "^2.24.0"
 
 [tool.poetry.dev-dependencies]
 
