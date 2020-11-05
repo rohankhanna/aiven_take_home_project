@@ -51,8 +51,10 @@ def consumer(run_once=False):
             except (KeyboardInterrupt, Exception, psycopg2.Error) as error:
                 pg_connection.close()
                 raise RuntimeError("Error while inserting into PG database: {error}")
-        if run_once:
-            return
+                if run_once:
+                    return "Database insert failed", data
+            if run_once:
+                return "INSERT INTO availability (website_id, available, status_code, response_time) VALUES(%s, %s, %s, %s);", data
 
 
 def main():

@@ -63,13 +63,15 @@ def producer(delay, website_ids, run_once=False):
 
     while True:
         time.sleep(delay)
+        data = []
         for url, website_id in website_ids.items():
             item = is_url_up(url, website_id)
+            data.append(item[0])
             producer.send(config["topic"], item)
         producer.flush()
         print("Published at: ", datetime.datetime.now())
         if run_once:
-            return
+            return data
 
 def main():
     if len(sys.argv) != 2:
@@ -77,7 +79,7 @@ def main():
         exit()
 
     delay = int(sys.argv[1])
-    website_ids = get_website_ids():
+    website_ids = get_website_ids()
     producer(delay, website_ids)
 
 if __name__ == "__main__":
