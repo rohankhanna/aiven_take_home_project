@@ -30,7 +30,7 @@ $ poetry install # to install dependencies. (Alternatively you may also do pip i
 In one shell session, run the consumer:
 
 ``` bash
-# Run the Kafka event producer
+# Run the Kafka event Consumer
 $ python consumer.py
 ```
 

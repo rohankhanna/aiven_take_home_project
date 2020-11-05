@@ -6,7 +6,6 @@ from utils import *
 
 if __name__ == "__main__":
 
-    
     kafka_config = get_kafka_config()
     
     consumer = KafkaConsumer(kafka_config["topic"],
@@ -28,7 +27,7 @@ if __name__ == "__main__":
         data = []
         messages = consumer.poll(timeout_ms=1000)
         if not messages.items():
-            print(messages.items())
+            print("No Messages")
         for _, messages in messages.items():
             for message in messages:
                 data.append(message.value[0])
@@ -39,8 +38,8 @@ if __name__ == "__main__":
                 cursor = pg_connection.cursor()
                 for item in data:
                     # insert query based on the data received
-                    # {'website_id': 12, 'available': True, 'status_code': 200, 'response_time': 0.175816, 'timestamp': '2020-11-05 16:20:04.226092'}]
-                    cursor.execute("INSERT INTO availability (website_id, available, status_code, response_time) VALUES(%s, %s, %s, %s);", (item['website_id'], item['available'], item['status_code'], item['response_time']))
+                    cursor.execute("INSERT INTO availability (website_id, available, status_code, response_time) VALUES(%s, %s, %s, %s);", \
+                        (item['website_id'], item['available'], item['status_code'], item['response_time']))
                 cursor.close()
                 pg_connection.commit()
             except (KeyboardInterrupt, Exception, psycopg2.Error) as error:

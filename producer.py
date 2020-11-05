@@ -68,7 +68,7 @@ if __name__ == "__main__":
             item = is_url_up(url, website_id)
             producer.send(config["topic"], item)
         producer.flush()
-        print(print( "published at: ", datetime.datetime.now()))
+        print("Published at: ", datetime.datetime.now())
 
 
     
